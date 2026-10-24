@@ -5,22 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#09152d" />
   <meta name="description" content="CHAGE and ASKAの楽曲、ライブ、作品、制作秘話を深く掘り下げるファン制作の4択検定。ランダム・年代別・全問挑戦に対応。" />
-  <!-- Open Graph / X(Twitter) Card: Xへの試験公開でもサムネイルを表示 -->
-  <meta property="og:type" content="website" />
   <meta property="og:title" content="CHAGE and ASKA 究極の超難問4択検定" />
-  <meta property="og:description" content="楽曲・ライブ・作品・制作秘話に挑戦。4択検定＆週替わり10問タイムアタック。" />
-  <meta property="og:url" content="https://maximum0303.github.io/chage-aska-quiz/" />
-  <meta property="og:image" content="https://maximum0303.github.io/chage-aska-quiz/ogp.png" />
-  <meta property="og:image:secure_url" content="https://maximum0303.github.io/chage-aska-quiz/ogp.png" />
-  <meta property="og:image:type" content="image/png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="青と金のコンサート風背景と二人の人物シルエットにCHAGE and ASKA 究極の超難問4択検定と書かれた画像" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="CHAGE and ASKA 究極の超難問4択検定" />
-  <meta name="twitter:description" content="楽曲・ライブ・作品・制作秘話に挑戦。4択検定＆週替わり10問タイムアタック。" />
-  <meta name="twitter:image" content="https://maximum0303.github.io/chage-aska-quiz/ogp.png" />
-  <meta name="twitter:image:alt" content="CHAGE and ASKA 究極の超難問4択検定・人物シルエットの告知画像" />
+  <meta property="og:description" content="デビュー前から現在まで。あなたはどこまで知っている？" />
   <title>CHAGE and ASKA｜究極の超難問4択検定</title>
   <style>
   :root { color-scheme: dark; --gold:#e4c177;--silver:#eff4ff;--muted:#a6b8d6;--line:rgba(199,217,255,.16); --card:rgba(12,29,59,.88); --ink:#edf3ff; }
@@ -55,6 +41,15 @@
   .rank-result-info strong{font-size:40px;color:#f3d38f;font-variant-numeric:tabular-nums}.quiz-review{white-space:pre-wrap;font-size:13px}
   .rank-note{font-size:12px;color:#bed0ed;border-left:3px solid #d8b56b;padding-left:10px;margin:15px 0}
   @media(max-width:740px){.ranking-rows li{font-size:12px}.ranking-block{padding:15px}}
+
+  /* Public leaderboard: Japanese completion timestamp, responsive display */
+  .ranking-rows .rank-user{display:flex;flex-direction:column;gap:1px;min-width:0;overflow-wrap:anywhere}
+  .ranking-rows .rank-name{font-weight:700;line-height:1.5}
+  .ranking-rows .rank-datetime{font-size:12px;color:#a6bddb;line-height:1.5;font-variant-numeric:tabular-nums}
+  .ranking-rows .rank-result{display:flex;align-items:flex-end;flex-direction:column;gap:1px;flex:none}
+  .ranking-rows .rank-score{color:#f1d18e;font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+  .ranking-rows .rank-time{color:#d5e0f4;font-size:13px;font-variant-numeric:tabular-nums}
+  @media(max-width:740px){.ranking-rows .rank-datetime{font-size:11px}.ranking-rows .rank-score{font-size:13px}.ranking-rows .rank-time{font-size:12px}}
 </style>
 </head>
 <body>
@@ -131,7 +126,41 @@
   function reviewList(items){const l=$('resultList');l.replaceChildren();items.forEach((r,i)=>{const li=document.createElement('li');const h=document.createElement('strong');h.textContent=`${i+1}問目：${r.question} — 正解 ${r.correct}（回答 ${r.choice}）`;const p=document.createElement('p');p.textContent=r.explanation||'';p.className='quiz-review';li.append(h,p);if(r.source){const cap=document.createElement('small');cap.textContent='出典：'+r.source;li.append(cap)}l.append(li)})}
   function grade(pct){return pct===100?'伝説級・完全制覇':pct>=80?'達人級':pct>=60?'上級者':pct>=40?'研究家':'挑戦者'}
   function results(r){const total=r.total,correct=r.correct,pct=Math.round(correct/total*100);$('resultCorrect').textContent=String(correct);$('resultTotal').textContent=String(total);$('grade').textContent=grade(pct);$('resultDetail').textContent=`正答率 ${pct}%　—　挑戦ありがとう！`;$('rankResultInfo').classList.toggle('hidden',active.mode!=='ranked10');if(active.mode==='ranked10'){$('finalTime').textContent=human(r.elapsedMs);$('personalRank').textContent=r.rank?'今週の暫定 '+r.rank+' 位':'';$('resultDetail').textContent=`正解数 ${correct}/${total} ｜ 公式タイム ${human(r.elapsedMs)}`;refreshRanks();}const text=`CHAGE and ASKA 究極の超難問4択検定に挑戦！\n${correct}/${total}問正解${active.mode==='ranked10'?'｜タイム '+human(r.elapsedMs):''}\n${grade(pct)}\n#CHAGEandASKA #チャゲアス検定`; $('shareBtn').href='https://twitter.com/intent/tweet?'+new URLSearchParams({text,url:location.href.split('#')[0]}).toString();reviewList(r.reviews||[]);show('results');active=null;question=null;}
-  function displayRanks(data){const host=$('rankingRows');host.replaceChildren();$('rankingWeek').textContent='対象週：'+(data.weekStart||'')+' 開始（日本時間・月曜日）';if(!data.entries?.length){const li=document.createElement('li');li.textContent='今週の挑戦者はまだいません。';host.append(li);return;}data.entries.forEach(r=>{const li=document.createElement('li');const left=document.createElement('span');left.textContent=r.position+'位  '+r.nickname;const right=document.createElement('strong');right.textContent=`${r.correct}/10　${human(r.elapsedMs)}`;li.append(left,right);host.append(li)})}
+  // Database stores timestamptz; explicitly display Japanese standard time.
+  function recordedAtJST(value){
+    if(!value)return '記録日時：未取得';
+    const d=new Date(value);
+    if(!Number.isFinite(d.getTime()))return '記録日時：未取得';
+    const f=new Intl.DateTimeFormat('ja-JP',{
+      timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit',
+      hour:'2-digit',minute:'2-digit',hourCycle:'h23'
+    });
+    const p=Object.fromEntries(f.formatToParts(d).map(x=>[x.type,x.value]));
+    return `${p.year}/${p.month}/${p.day} ${p.hour}:${p.minute} JST`;
+  }
+  function displayRanks(data){
+    const host=$('rankingRows');host.replaceChildren();
+    $('rankingWeek').textContent='対象週：'+(data.weekStart||'')+' 開始（日本時間・月曜日）';
+    if(!data.entries?.length){
+      const li=document.createElement('li');li.textContent='今週の挑戦者はまだいません。';host.append(li);return;
+    }
+    data.entries.forEach(r=>{
+      const li=document.createElement('li');
+      const left=document.createElement('span');left.className='rank-user';
+      const name=document.createElement('span');name.className='rank-name';
+      name.textContent=r.position+'位  '+r.nickname;
+      const date=document.createElement('span');date.className='rank-datetime';
+      date.textContent=recordedAtJST(r.createdAt);
+      left.append(name,date);
+      const right=document.createElement('span');right.className='rank-result';
+      const score=document.createElement('span');score.className='rank-score';
+      score.textContent=`${r.correct}/10 正解`;
+      const time=document.createElement('span');time.className='rank-time';
+      time.textContent=human(r.elapsedMs);
+      right.append(score,time);
+      li.append(left,right);host.append(li);
+    });
+  }
   async function refreshRanks(){try{displayRanks(await api('leaderboard'))}catch(e){$('rankingWeek').textContent='ランキングを取得できません：'+errorMessage(e)}}
   async function load(){if(!okConfig){$('dataStatus').textContent='Supabaseの接続設定が未入力です（config.js を編集してください）';$('loadError').classList.remove('hidden');$('loadError').textContent='管理者向け：GitHubの config.js にSupabase Project RefとPublishable keyを設定すると利用できます。';$('startBtn').disabled=true;return}try{const meta=await api('metadata');$('dataStatus').textContent=meta.total+'問の問題をサーバーに読み込みました';$('dataCountFooter').textContent=' · 登録問題数 '+meta.total;for(const name of ['era','category']){const sel=$(name);const vals=name==='era'?meta.eras:meta.categories;for(const v of vals||[]){const opt=document.createElement('option');opt.value=v;opt.textContent=v;sel.add(opt)}}$('startBtn').disabled=false;await refreshRanks()}catch(e){$('dataStatus').textContent='接続エラー：'+errorMessage(e);$('startBtn').disabled=true}}
   document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;course()}));$('startBtn').addEventListener('click',start);$('nextBtn').addEventListener('click',()=>{if(pending){paintQuestion(pending);window.scrollTo({top:0,behavior:'smooth'})}});$('homeBtn').addEventListener('click',()=>{if(active&&!confirm('途中で終了するとランキングには登録されません。よろしいですか？'))return;stopTimer();active=null;show('home')});$('quitBtn').addEventListener('click',()=>{if(!confirm('この挑戦を終了しますか？ タイムアタックは再開できません。'))return;stopTimer();active=null;show('home')});$('resultHomeBtn').addEventListener('click',()=>{show('home');refreshRanks()});$('againBtn').addEventListener('click',()=>{show('home');start()});$('refreshRanks').addEventListener('click',refreshRanks);$('nickname').addEventListener('change',()=>{try{localStorage.setItem('ca_quiz_nickname', $('nickname').value.trim().slice(0,24))}catch{}});try{$('nickname').value=localStorage.getItem('ca_quiz_nickname')||''}catch{}course();load();
