@@ -8,12 +8,12 @@
   <meta property="og:title" content="CHAGE and ASKA 究極の超難問4択検定" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://maximum0303.github.io/chage-aska-quiz/" />
-  <meta property="og:description" content="C&A、Chage・ASKAのソロ、MULTI MAXまで。全200問の超難問4択検定！" />
+  <meta property="og:description" content="C&A、Chage・ASKAのソロ、MULTI MAXまで。全230問の超難問4択検定！" />
   <meta property="og:image" content="https://maximum0303.github.io/chage-aska-quiz/ogp.png" />
   <meta property="og:image:alt" content="CHAGE and ASKA 究極の超難問4択検定" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="CHAGE and ASKA 究極の超難問4択検定" />
-  <meta name="twitter:description" content="C&A、Chage・ASKAのソロ、MULTI MAXまで。全200問の超難問4択検定！" />
+  <meta name="twitter:description" content="C&A、Chage・ASKAのソロ、MULTI MAXまで。全230問の超難問4択検定！" />
   <meta name="twitter:image" content="https://maximum0303.github.io/chage-aska-quiz/ogp.png" />
   
   <title>CHAGE and ASKA｜究極の超難問4択検定</title>
@@ -73,21 +73,21 @@
         <div class="grid" role="group" aria-label="出題コース">
           <button class="mode-card active" type="button" data-mode="10" aria-pressed="true"><span class="mode-icon" aria-hidden="true">✦</span><strong>10問チャレンジ</strong><small>気軽に力試し</small></button>
           <button class="mode-card" type="button" data-mode="20" aria-pressed="false"><span class="mode-icon" aria-hidden="true">◇</span><strong>20問チャレンジ</strong><small>じっくり挑戦</small></button>
-          <button class="mode-card" type="button" data-mode="all" aria-pressed="false"><span class="mode-icon" aria-hidden="true">♛</span><strong>全問挑戦</strong><small>全200問・1問不正解で即終了</small></button>
+          <button class="mode-card" type="button" data-mode="all" aria-pressed="false"><span class="mode-icon" aria-hidden="true">♛</span><strong>全問挑戦</strong><small>全230問・1問不正解で即終了</small></button>
           <button class="mode-card" type="button" data-mode="ranked10" aria-pressed="false"><span class="mode-icon" aria-hidden="true">⏱</span><strong>今週のタイムアタック</strong><small>全員共通10問・順位つき</small></button>
         </div>
         <div class="filters" id="quizFilters"><div class="field"><label for="era">年代を選択（任意）</label><select id="era" class="select"><option value="">全年代から出題</option></select></div><div class="field"><label for="category">ジャンルを選択（任意）</label><select id="category" class="select"><option value="">全ジャンルから出題</option></select></div></div>
         <div id="nicknameField" class="nickname-wrap hidden"><label for="nickname">ランキングに表示する名前（任意・24文字以内）</label><input id="nickname" type="text" maxlength="24" placeholder="例：TUGs" autocomplete="nickname"></div>
         <p id="anonymousNameHelp" class="rank-note hidden">名前を入力しない場合は、「名無し #001」のような番号付きでランキングに登録されます。どなたでも参加できます。</p>
         <p id="timedInfo" class="rank-note hidden">問題は毎週月曜日（日本時間）に更新。回答後の正誤表示なし・10問終了後にまとめて採点。タイムはサーバー側で計測します。</p>
-        <p id="allInfo" class="rank-note hidden">♛ 全200問が毎回ランダムな順番で出題されます。1問不正解で即終了。何問連続で正解できたかを歴代ランキングに記録します。</p>
+        <p id="allInfo" class="rank-note hidden">♛ 全230問が毎回ランダムな順番で出題されます。1問不正解で即終了。何問連続で正解できたかを歴代ランキングに記録します。</p>
         <div id="dataStatus" class="stats" aria-live="polite"><span class="dot warn" aria-hidden="true"></span><span>問題データを確認しています…</span></div>
         <div id="loadError" class="notice hidden" role="status">Supabaseの接続設定が必要です。</div>
         <div class="action-row"><button id="startBtn" class="primary" disabled>検定をスタート →</button><a id="homeShareBtn" class="share" href="https://twitter.com/intent/tweet?text=CHAGE+and+ASKA+%E7%A9%B6%E6%A5%B5%E3%81%AE%E8%B6%85%E9%9B%A3%E5%95%8F4%E6%8A%9E%E6%A4%9C%E5%AE%9A%EF%BC%81%0A%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AF%E4%BD%95%E5%95%8F%E6%AD%A3%E8%A7%A3%E3%81%A7%E3%81%8D%E3%82%8B%EF%BC%9F%0A%23CHAGEandASKA+%23%E3%83%81%E3%83%A3%E3%82%B2%E3%82%A2%E3%82%B9%E6%A4%9C%E5%AE%9A&amp;url=https%3A%2F%2Fmaximum0303.github.io%2Fchage-aska-quiz%2F" target="_blank" rel="noopener noreferrer" aria-label="CHAGE and ASKA検定をXで共有">𝕏 検定をシェア ↗</a></div>
         <section class="ranking-block" aria-label="全参加者ランキング"><h3>🏆 今週のタイムアタックランキング</h3><p id="rankingWeek">読み込み中…</p><ol id="rankingRows" class="ranking-rows"></ol><p>正解数が多い人が上位。同じ正解数なら速い人が上位です。</p><button class="secondary" id="refreshRanks" type="button">ランキングを更新</button></section>
         <section class="ranking-block" aria-label="歴代・完全制覇ランキング">
           <h3>♛ 歴代・完全制覇ランキング</h3>
-          <p id="allRankStatus">全200問・1問間違えたら即終了。出題順は毎回ランダム。連続正解数で競います。</p>
+          <p id="allRankStatus">全230問・1問間違えたら即終了。出題順は毎回ランダム。連続正解数で競います。</p>
           <ol id="allRankRows" class="ranking-rows"></ol>
           <p>連続正解数が多い順。同数なら所要時間が短い順。上位30記録を表示。</p>
           <button class="secondary" id="refreshAllRanks" type="button">ランキングを更新</button>
