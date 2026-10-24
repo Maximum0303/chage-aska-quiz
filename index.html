@@ -146,24 +146,25 @@
   }
   function courseName(m){return ({'10':'10問チャレンジ','20':'20問チャレンジ','all':'全問挑戦','ranked10':'今週のタイムアタック'})[m]||'検定'}
   function results(r){
-    const total=Number(r.total)||0,correct=Number(r.correct)||0,pct=total?Math.round(correct/total*100):0;
+    const total=Number(r.total)||0,correct=Number(r.correct)||0,attempted=Number(r.attempted)||total,pct=total?Math.round(correct/total*100):0;
+    const eliminated=Boolean(r.stoppedEarly)&&((attemptScope?.mode||active?.mode||mode)==='all');
     const scope=attemptScope||{mode:active?.mode||mode,era:'',category:''};
     const fullCatalog=scope.mode==='all'&&!scope.era&&!scope.category&&questionBankTotal>=20&&total===questionBankTotal;
     const title=courseName(scope.mode)+(scope.mode==='all'&&!fullCatalog?'（対象'+total+'問）':'');
     const eraText=scope.era||'全年代',catText=scope.category||'全ジャンル';
-    const titleGrade=resultGrade(correct,total,fullCatalog),perfect=total>0&&correct===total;
+    const titleGrade=eliminated?'完全制覇ならず':resultGrade(correct,total,fullCatalog),perfect=!eliminated&&total>0&&correct===total;
     $('resultCorrect').textContent=String(correct);$('resultTotal').textContent=String(total);
     $('grade').textContent=titleGrade;
     $('resultAchievement').textContent=perfect?'全問正解！':'';
     $('resultAchievement').classList.toggle('hidden',!perfect);
     $('resultScope').textContent='コース：'+title+'\n年代：'+eraText+'\nジャンル：'+catText;
-    $('resultDetail').textContent='正答率 '+pct+'%　—　挑戦ありがとう！';
+    $('resultDetail').textContent=eliminated?'第'+(Number(r.failedAt)||attempted)+'問で終了 ｜ '+correct+'問連続正解 ｜ 全'+total+'問中':'正答率 '+pct+'%　—　挑戦ありがとう！';
     $('rankResultInfo').classList.toggle('hidden',scope.mode!=='ranked10');
     if(scope.mode==='ranked10'){
       $('finalTime').textContent=human(r.elapsedMs);$('personalRank').textContent=r.rank?'今週の暫定 '+r.rank+' 位':'';
       $('resultDetail').textContent='正解数 '+correct+'/'+total+' ｜ 公式タイム '+human(r.elapsedMs);refreshRanks();
     }
-    const shareLines=['CHAGE and ASKA 究極の超難問4択検定に挑戦！','コース：'+title,'年代：'+eraText,'ジャンル：'+catText,'結果：'+correct+'/'+total+'問正解（'+pct+'%）','称号：'+titleGrade];
+    const shareLines=['CHAGE and ASKA 究極の超難問4択検定に挑戦！','コース：'+title,'年代：'+eraText,'ジャンル：'+catText,eliminated?'結果：第'+(Number(r.failedAt)||attempted)+'問で終了（'+correct+'問連続正解／全'+total+'問）':'結果：'+correct+'/'+total+'問正解（'+pct+'%）','称号：'+titleGrade];
     if(perfect)shareLines.push('全問正解！');
     if(scope.mode==='ranked10')shareLines.push('公式タイム：'+human(r.elapsedMs));
     shareLines.push('#CHAGEandASKA #チャゲアス検定');
