@@ -59,6 +59,30 @@
   .ranking-rows .rank-score{color:#f1d18e;font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
   .ranking-rows .rank-time{color:#d5e0f4;font-size:13px;font-variant-numeric:tabular-nums}
   @media(max-width:740px){.ranking-rows .rank-datetime{font-size:11px}.ranking-rows .rank-score{font-size:13px}.ranking-rows .rank-time{font-size:12px}}
+
+  /* No-account, browser-only personal score history */
+  .my-records{margin-top:24px;padding:22px;border:1px solid rgba(223,191,125,.35);border-radius:16px;background:#0b2040}
+  .my-records h3{color:#efd398;margin:0 0 8px;font-size:18px}
+  .my-records .my-help{color:#b9cce6;font-size:12px;line-height:1.8}
+  .my-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+  .my-tabs button{padding:9px 14px;border:1px solid #6382ad;border-radius:10px;color:#ecf3ff;background:#142e50}
+  .my-tabs button.active{border-color:#f2c87d;color:#ffda8c;background:#243a58}
+  .my-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:12px 0}
+  .my-stat{padding:12px;background:#102645;border:1px solid #365070;border-radius:12px}
+  .my-stat small{display:block;color:#b5c9e5;font-size:11px}
+  .my-stat strong{font-size:22px;display:block;color:#ffdb96;font-variant-numeric:tabular-nums}
+  .my-record-list{list-style:none;margin:10px 0;padding:0;max-height:420px;overflow:auto}
+  .my-record-list li{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #304b70}
+  .my-record-date,.my-record-score{display:flex;flex-direction:column;gap:3px;font-size:13px}
+  .my-record-score{align-items:flex-end;font-weight:800;color:#f5d28b;white-space:nowrap}
+  .my-record-scope,.my-record-time{font-size:11px;color:#b1c7e6;font-weight:400;white-space:normal}
+  .my-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:15px}
+  .my-tools button,.my-import-label{font:inherit;cursor:pointer;color:#e8f0ff;background:#173053;border:1px solid #6b84ab;padding:9px 12px;border-radius:10px;font-size:12px}
+  .my-tools button:disabled{opacity:.5;cursor:not-allowed}
+  .my-tools .danger{border-color:#9c6870;color:#ffd7d9}
+  .my-save-notice{color:#9cf0c9;font-size:13px;line-height:1.8;text-align:center}
+  .my-save-notice.my-save-error{color:#ffbfbf}
+  @media(max-width:740px){.my-records{padding:15px}.my-stats{grid-template-columns:repeat(2,1fr)}}
 </style>
   <!-- X / social sharing card -->
 </head>
@@ -84,6 +108,29 @@
         <div id="dataStatus" class="stats" aria-live="polite"><span class="dot warn" aria-hidden="true"></span><span>問題データを確認しています…</span></div>
         <div id="loadError" class="notice hidden" role="status">Supabaseの接続設定が必要です。</div>
         <div class="action-row"><button id="startBtn" class="primary" disabled>検定をスタート →</button><a id="homeShareBtn" class="share" href="https://twitter.com/intent/tweet?text=CHAGE+and+ASKA+%E7%A9%B6%E6%A5%B5%E3%81%AE%E8%B6%85%E9%9B%A3%E5%95%8F4%E6%8A%9E%E6%A4%9C%E5%AE%9A%EF%BC%81%0A%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AF%E4%BD%95%E5%95%8F%E6%AD%A3%E8%A7%A3%E3%81%A7%E3%81%8D%E3%82%8B%EF%BC%9F%0A%23CHAGEandASKA+%23%E3%83%81%E3%83%A3%E3%82%B2%E3%82%A2%E3%82%B9%E6%A4%9C%E5%AE%9A&amp;url=https%3A%2F%2Fmaximum0303.github.io%2Fchage-aska-quiz%2F" target="_blank" rel="noopener noreferrer" aria-label="CHAGE and ASKA検定をXで共有">𝕏 検定をシェア ↗</a></div>
+
+        <section class="my-records" id="myRecords" aria-label="自分だけの記録">
+          <h3>✦ マイ記録</h3>
+          <p class="my-help">登録・ログイン不要。10問・20問チャレンジの結果を<strong>このブラウザ内だけ</strong>に保存します。サイト管理者や他の利用者がマイ記録画面を見ることはできません。ただし、同じ端末・ブラウザを使う人には表示されます。<br>別端末への自動同期はありません。シークレットモードやサイトデータの削除で消える場合があります。バックアップの保存をおすすめします。</p>
+          <div class="my-tabs" role="group" aria-label="記録のコース選択">
+            <button type="button" data-my-mode="10" class="active" aria-pressed="true">10問チャレンジ</button>
+            <button type="button" data-my-mode="20" aria-pressed="false">20問チャレンジ</button>
+          </div>
+          <div class="my-stats">
+            <div class="my-stat"><small>挑戦回数</small><strong id="myAttempts">—</strong></div>
+            <div class="my-stat"><small>最高正解数</small><strong id="myBest">—</strong></div>
+            <div class="my-stat"><small>平均正答率</small><strong id="myAverage">—</strong></div>
+            <div class="my-stat"><small>最高得点時の最速</small><strong id="myBestTime">—</strong></div>
+          </div>
+          <p id="myRecordsStatus" class="my-help" role="status">記録を確認しています…</p>
+          <ol id="myRecordsList" class="my-record-list"></ol>
+          <p class="my-help">時間はこの画面で測った参考値です。通信状態や画面の中断で変わるため、公式タイムアタックとは比較できません。過去の挑戦は遡って記録されません。</p>
+          <div class="my-tools">
+            <button id="myExport" type="button">記録をバックアップ</button>
+            <label class="my-import-label" for="myImport">バックアップを読み込む<input type="file" id="myImport" accept="application/json,.json" class="sr-only"></label>
+            <button id="myClear" type="button" class="danger">このブラウザの記録を削除</button>
+          </div>
+        </section>
         <section class="ranking-block" aria-label="全参加者ランキング"><h3>🏆 今週のタイムアタックランキング</h3><p id="rankingWeek">読み込み中…</p><ol id="rankingRows" class="ranking-rows"></ol><p>正解数が多い人が上位。同じ正解数なら速い人が上位です。</p><button class="secondary" id="refreshRanks" type="button">ランキングを更新</button></section>
         <section class="ranking-block" aria-label="歴代・完全制覇ランキング">
           <h3>♛ 歴代・完全制覇ランキング</h3>
@@ -104,7 +151,7 @@
       <div class="nextrow"><button id="quitBtn" class="muted-btn">終了してトップへ</button><button id="nextBtn" class="primary hidden">次の問題 →</button></div>
     </section>
     <section id="results" class="panel maincard hidden" aria-label="検定結果">
-      <div class="result-card"><div class="result-label">YOUR RESULT</div><h2 class="section-title">挑戦結果</h2><div class="result-count"><span id="resultCorrect">0</span><small> / <span id="resultTotal">0</span>問</small></div><div id="grade" class="grade"></div><div id="resultAchievement" class="result-achievement hidden"></div><div id="resultScope" class="result-scope" aria-label="挑戦条件"></div><p id="resultDetail" class="result-detail"></p><div class="result-actions"><button id="againBtn" class="primary">もう一度挑戦</button><a id="shareBtn" class="share" href="#" target="_blank" rel="noopener noreferrer">Xで結果をシェア ↗</a><button id="resultHomeBtn" class="secondary">コース選択へ</button></div></div>
+      <div class="result-card"><div class="result-label">YOUR RESULT</div><h2 class="section-title">挑戦結果</h2><div class="result-count"><span id="resultCorrect">0</span><small> / <span id="resultTotal">0</span>問</small></div><div id="grade" class="grade"></div><div id="resultAchievement" class="result-achievement hidden"></div><div id="resultScope" class="result-scope" aria-label="挑戦条件"></div><p id="resultDetail" class="result-detail"></p><div class="result-actions"><button id="againBtn" class="primary">もう一度挑戦</button><a id="shareBtn" class="share" href="#" target="_blank" rel="noopener noreferrer">Xで結果をシェア ↗</a><button id="resultHomeBtn" class="secondary">コース選択へ</button><button id="myRecordsFromResultBtn" class="secondary">マイ記録を見る</button></div><p id="myRecordSaved" class="my-save-notice hidden" role="status"></p></div>
       <div class="rank-result-info hidden" id="rankResultInfo"><div>⏱ サーバー公式タイム</div><strong id="finalTime">00:00.00</strong><p id="personalRank"></p><p>ランキングへの登録は自動で完了しています。</p></div>
       <details class="result-answers"><summary>今回出題された問題と正解を見る</summary><ol id="resultList"></ol></details>
     </section>
@@ -121,7 +168,7 @@
     /^sb_publishable_/.test(cfg.publishableKey||'');
   const endpoint=okConfig?`https://${cfg.projectRef}.supabase.co/functions/v1/ca-quiz`:'';
   const KEYS=['A','B','C','D'];
-  let mode='10',active=null,question=null,pending=null,correctSoFar=0,requestBusy=false,clockStart=0,timer=null,questionBankTotal=0,attemptScope=null;
+  let mode='10',active=null,question=null,pending=null,correctSoFar=0,requestBusy=false,clockStart=0,timer=null,questionBankTotal=0,attemptScope=null,personalChallengeStartedAt=0;
   function human(ms){const c=Math.max(0,Math.floor(ms/10));return `${String(Math.floor(c/6000)).padStart(2,'0')}:${String(Math.floor((c%6000)/100)).padStart(2,'0')}.${String(c%100).padStart(2,'0')}`}
   function errorMessage(e){return String(e?.message||'通信に失敗しました');}
   async function api(action,data={}){
@@ -177,7 +224,7 @@
       return inMemoryPlayerId;
     }
   }
-  async function start(){if(requestBusy)return;const nickname=$('nickname').value.trim();if((mode==='ranked10'||mode==='all')&&nickname.length>24){alert('ランキング名は24文字以内で入力してください');$('nickname').focus();return;}setBusy(true);$('startBtn').textContent='開始しています…';try{const useFilters=mode==='10'||mode==='20';const selectedEra=useFilters?$('era').value:'';const selectedCategory=useFilters?$('category').value:'';const resp=await api('start',{mode,era:selectedEra,category:selectedCategory,nickname,playerId:getPlayerId()});attemptScope={mode,era:selectedEra,category:selectedCategory};active=resp;correctSoFar=0;paintQuestion(resp.question);$('liveTimer').classList.toggle('hidden',mode!=='ranked10');$('timedQuestionNote').classList.toggle('hidden',mode!=='ranked10');show('quiz');if(mode==='ranked10')startTimer();}catch(e){alert(errorMessage(e))}finally{$('startBtn').textContent='検定をスタート →';setBusy(false)}}
+  async function start(){if(requestBusy)return;const nickname=$('nickname').value.trim();if((mode==='ranked10'||mode==='all')&&nickname.length>24){alert('ランキング名は24文字以内で入力してください');$('nickname').focus();return;}setBusy(true);$('startBtn').textContent='開始しています…';try{const useFilters=mode==='10'||mode==='20';const selectedEra=useFilters?$('era').value:'';const selectedCategory=useFilters?$('category').value:'';const resp=await api('start',{mode,era:selectedEra,category:selectedCategory,nickname,playerId:getPlayerId()});attemptScope={mode,era:selectedEra,category:selectedCategory};active=resp;personalChallengeStartedAt=performance.now();correctSoFar=0;paintQuestion(resp.question);$('liveTimer').classList.toggle('hidden',mode!=='ranked10');$('timedQuestionNote').classList.toggle('hidden',mode!=='ranked10');show('quiz');if(mode==='ranked10')startTimer();}catch(e){alert(errorMessage(e))}finally{$('startBtn').textContent='検定をスタート →';setBusy(false)}}
   async function answer(key){if(!active||!question||requestBusy||pending)return;setBusy(true);try{const resp=await api('answer',{sessionId:active.sessionId,token:active.token,choice:key});document.querySelectorAll('#choices button').forEach(b=>b.disabled=true);$('progressFill').style.width=(question.index/question.total*100)+'%';$('progressBar').setAttribute('aria-valuenow',String(Math.round(question.index/question.total*100)));if(resp.done){stopTimer();results(resp);return;}if(active.mode==='ranked10'){paintQuestion(resp.nextQuestion);return;}pending=resp.nextQuestion;const fb=resp.feedback;if(fb.correct)correctSoFar++;$('score').textContent=`正解 ${correctSoFar} 問`;$('feedbackTitle').textContent=fb.correct?'正解！':'残念！';$('feedbackTitle').className=fb.correct?'good':'bad';$('answerText').textContent='正解：'+fb.key; $('explanation').textContent=fb.explanation||'';const src=$('sources');src.replaceChildren();if(fb.source){const p=document.createElement('p');p.textContent='出典：'+fb.source;src.append(p)}if(fb.sourceUrl){try{const u=new URL(fb.sourceUrl);if(u.protocol==='https:'||u.protocol==='http:'){const a=document.createElement('a');a.href=u.href;a.textContent='出典ページを開く ↗';a.target='_blank';a.rel='noopener noreferrer';src.append(a)}}catch{}}document.querySelectorAll('#choices button').forEach(b=>b.classList.toggle('correct',b.dataset.key===fb.key));$('feedback').classList.remove('hidden');$('nextBtn').classList.remove('hidden');$('nextBtn').textContent='次の問題 →';$('feedback').scrollIntoView({block:'nearest',behavior:'smooth'});
     }catch(e){alert('回答を送信できませんでした。通信状態をご確認ください。\n'+errorMessage(e))}finally{setBusy(false);if(pending||!active||$('results').classList.contains('hidden')===false)document.querySelectorAll('#choices button').forEach(b=>b.disabled=true)}}
   function reviewList(items){const l=$('resultList');l.replaceChildren();items.forEach((r,i)=>{const li=document.createElement('li');const h=document.createElement('strong');h.textContent=`${i+1}問目：${r.question} — 正解 ${r.correct}（回答 ${r.choice}）`;const p=document.createElement('p');p.textContent=r.explanation||'';p.className='quiz-review';li.append(h,p);if(r.source){const cap=document.createElement('small');cap.textContent='出典：'+r.source;li.append(cap)}l.append(li)})}
@@ -221,7 +268,16 @@
     if(scope.mode==='ranked10')shareLines.push('公式タイム：'+human(r.elapsedMs));
     shareLines.push('#CHAGEandASKA #チャゲアス検定');
     $('shareBtn').href='https://twitter.com/intent/tweet?'+new URLSearchParams({text:shareLines.join('\n'),url:location.href.split('#')[0]}).toString();
-    reviewList(r.reviews||[]);show('results');active=null;question=null;
+    reviewList(r.reviews||[]);
+    $('myRecordSaved').classList.add('hidden');
+    if(scope.mode==='10'||scope.mode==='20'){
+      window.dispatchEvent(new CustomEvent('ca-quiz-finished',{detail:{
+        mode:scope.mode,sessionId:active?.sessionId,correct,total,
+        era:scope.era,category:scope.category,
+        elapsedMs:personalChallengeStartedAt?performance.now()-personalChallengeStartedAt:0
+      }}));
+    }
+    show('results');active=null;question=null;
   }
   // Database stores timestamptz; explicitly display Japanese standard time.
   function recordedAtJST(value){
@@ -290,9 +346,10 @@
     }
   }
   async function load(){if(!okConfig){$('dataStatus').textContent='Supabaseの接続設定が未入力です（config.js を編集してください）';$('loadError').classList.remove('hidden');$('loadError').textContent='管理者向け：GitHubの config.js にSupabase Project RefとPublishable keyを設定すると利用できます。';$('startBtn').disabled=true;return}try{const meta=await api('metadata');questionBankTotal=Number(meta.total)||0;renderQuestionCount();$('dataStatus').textContent=questionBankTotal+'問の問題をサーバーに読み込みました';for(const name of ['era','category']){const sel=$(name);const vals=name==='era'?meta.eras:meta.categories;for(const v of vals||[]){const opt=document.createElement('option');opt.value=v;opt.textContent=v;sel.add(opt)}}$('startBtn').disabled=false;await refreshRanks()}catch(e){$('dataStatus').textContent='接続エラー：'+errorMessage(e);$('startBtn').disabled=true}}
-  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;course()}));$('startBtn').addEventListener('click',start);$('nextBtn').addEventListener('click',()=>{if(pending){paintQuestion(pending);window.scrollTo({top:0,behavior:'smooth'})}});$('homeBtn').addEventListener('click',()=>{if(active&&!confirm('途中で終了するとランキングには登録されません。よろしいですか？'))return;stopTimer();active=null;show('home')});$('quitBtn').addEventListener('click',()=>{if(!confirm('この挑戦を終了しますか？ タイムアタックは再開できません。'))return;stopTimer();active=null;show('home')});$('resultHomeBtn').addEventListener('click',()=>{show('home');refreshRanks()});$('againBtn').addEventListener('click',()=>{show('home');start()});$('refreshRanks').addEventListener('click',refreshRanks);$('refreshAllRanks').addEventListener('click',refreshRanks);$('nickname').addEventListener('change',()=>{try{localStorage.setItem('ca_quiz_nickname', $('nickname').value.trim().slice(0,24))}catch{}});try{$('nickname').value=localStorage.getItem('ca_quiz_nickname')||''}catch{}course();load();
+  document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;course()}));$('startBtn').addEventListener('click',start);$('nextBtn').addEventListener('click',()=>{if(pending){paintQuestion(pending);window.scrollTo({top:0,behavior:'smooth'})}});$('homeBtn').addEventListener('click',()=>{if(active&&!confirm('途中で終了するとランキングには登録されません。よろしいですか？'))return;stopTimer();active=null;show('home')});$('quitBtn').addEventListener('click',()=>{if(!confirm('この挑戦を終了しますか？ タイムアタックは再開できません。'))return;stopTimer();active=null;show('home')});$('resultHomeBtn').addEventListener('click',()=>{show('home');refreshRanks()});$('myRecordsFromResultBtn').addEventListener('click',()=>{show('home');$('myRecords').scrollIntoView({block:'start',behavior:'smooth'})});$('againBtn').addEventListener('click',()=>{show('home');start()});$('refreshRanks').addEventListener('click',refreshRanks);$('refreshAllRanks').addEventListener('click',refreshRanks);$('nickname').addEventListener('change',()=>{try{localStorage.setItem('ca_quiz_nickname', $('nickname').value.trim().slice(0,24))}catch{}});try{$('nickname').value=localStorage.getItem('ca_quiz_nickname')||''}catch{}course();load();
 })();
 
 </script>
+<script src="./personal-records.js"></script>
 </body>
 </html>
