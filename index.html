@@ -83,6 +83,20 @@
   .my-save-notice{color:#9cf0c9;font-size:13px;line-height:1.8;text-align:center}
   .my-save-notice.my-save-error{color:#ffbfbf}
   @media(max-width:740px){.my-records{padding:15px}.my-stats{grid-template-columns:repeat(2,1fr)}}
+  /* Individual history analytics, rendered entirely in the browser */
+  .my-insights{margin:20px 0 10px;padding:16px;background:#102645;border:1px solid #365070;border-radius:13px}
+  .my-insights h4{font-size:16px;color:#f1d18e;margin:0 0 10px}
+  .my-trend-svg{display:block;width:100%;height:auto;max-height:245px}
+  .my-breakdown{display:grid;gap:12px;margin:12px 0 4px}
+  .my-breakdown-item{display:grid;gap:7px}
+  .my-breakdown-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:13px}
+  .my-breakdown-head strong{color:#f2e4be;overflow-wrap:anywhere}
+  .my-breakdown-head span{color:#bed0e9;text-align:right;font-variant-numeric:tabular-nums}
+  .my-breakdown-track{height:9px;border-radius:20px;background:#284363;overflow:hidden}
+  .my-breakdown-fill{display:block;height:100%;border-radius:20px;background:linear-gradient(90deg,#8fa9d0,#edd18d)}
+  .my-analysis-empty{font-size:13px;color:#bdcde4;margin:8px 0 4px}
+  @media(max-width:500px){.my-insights{padding:12px}.my-breakdown-head{font-size:12px}}
+  /* ca-quiz-my-analysis-v2 */
 </style>
   <!-- X / social sharing card -->
 </head>
@@ -123,7 +137,19 @@
             <div class="my-stat"><small>最高得点時の最速</small><strong id="myBestTime">—</strong></div>
           </div>
           <p id="myRecordsStatus" class="my-help" role="status">記録を確認しています…</p>
+          <section class="my-insights" aria-label="正答率の推移と得意・苦手分析">
+            <h4>正答率の推移グラフ</h4>
+            <div id="myTrendChart"></div><p id="myTrendNote" class="my-help"></p>
+            <h4>年代別の正答率（苦手な順）</h4>
+            <div id="myEraBreakdown" class="my-breakdown"></div>
+            <h4 style="margin-top:22px">ジャンル別の正答率（苦手な順）</h4>
+            <div id="myCategoryBreakdown" class="my-breakdown"></div>
+            <p id="myAnalysisNote" class="my-help"></p>
+            <p id="myCategoryCaution" class="my-help"></p>
+            <p class="my-help">各問題の正誤を集計しています。ジャンルが複数ある問題は各ジャンルに計上します。試行数が少ない場合、苦手・得意の判断には注意が必要です。</p>
+          </section>
           <ol id="myRecordsList" class="my-record-list"></ol>
+
           <p class="my-help">時間はこの画面で測った参考値です。通信状態や画面の中断で変わるため、公式タイムアタックとは比較できません。過去の挑戦は遡って記録されません。</p>
           <div class="my-tools">
             <button id="myExport" type="button">記録をバックアップ</button>
@@ -168,7 +194,7 @@
     /^sb_publishable_/.test(cfg.publishableKey||'');
   const endpoint=okConfig?`https://${cfg.projectRef}.supabase.co/functions/v1/ca-quiz`:'';
   const KEYS=['A','B','C','D'];
-  let mode='10',active=null,question=null,pending=null,correctSoFar=0,requestBusy=false,clockStart=0,timer=null,questionBankTotal=0,attemptScope=null,personalChallengeStartedAt=0;
+  let mode='10',active=null,question=null,pending=null,correctSoFar=0,requestBusy=false,clockStart=0,timer=null,questionBankTotal=0,attemptScope=null,personalChallengeStartedAt=0,questionMetaForPersonal=[];
   function human(ms){const c=Math.max(0,Math.floor(ms/10));return `${String(Math.floor(c/6000)).padStart(2,'0')}:${String(Math.floor((c%6000)/100)).padStart(2,'0')}.${String(c%100).padStart(2,'0')}`}
   function errorMessage(e){return String(e?.message||'通信に失敗しました');}
   async function api(action,data={}){
@@ -203,7 +229,7 @@
     $('dataCountFooter').textContent=questionBankTotal>0?' · 登録問題数 '+questionBankTotal:'';
   }
   function addChoices(q){const host=$('choices');host.replaceChildren();KEYS.forEach((k,i)=>{const button=document.createElement('button');button.className='choice';button.type='button';button.dataset.key=k;const label=document.createElement('span');label.className='key';label.textContent=k;const content=document.createElement('span');content.className='value';content.textContent=q.options[i];button.append(label,content);button.addEventListener('click',()=>answer(k));host.append(button)});}
-  function paintQuestion(q){question=q;pending=null;$('counter').textContent=`問題 ${q.index} / ${q.total}`;$('score').textContent=active.mode==='ranked10'?'終了後に採点':`正解 ${correctSoFar} 問`;$('progressFill').style.width=((q.index-1)/q.total*100)+'%';$('progressBar').setAttribute('aria-valuenow',String(Math.round((q.index-1)/q.total*100)));$('questionTag').textContent=[q.era,q.difficulty].filter(Boolean).join(' / ');$('questionText').textContent=q.question;$('feedback').classList.add('hidden');$('nextBtn').classList.add('hidden');addChoices(q);$('questionText').focus({preventScroll:true});}
+  function paintQuestion(q){question=q;pending=null;if(active&&(active.mode==='10'||active.mode==='20'))questionMetaForPersonal[q.index-1]={era:String(q.era||''),categories:Array.isArray(q.categories)?q.categories:[]};$('counter').textContent=`問題 ${q.index} / ${q.total}`;$('score').textContent=active.mode==='ranked10'?'終了後に採点':`正解 ${correctSoFar} 問`;$('progressFill').style.width=((q.index-1)/q.total*100)+'%';$('progressBar').setAttribute('aria-valuenow',String(Math.round((q.index-1)/q.total*100)));$('questionTag').textContent=[q.era,q.difficulty].filter(Boolean).join(' / ');$('questionText').textContent=q.question;$('feedback').classList.add('hidden');$('nextBtn').classList.add('hidden');addChoices(q);$('questionText').focus({preventScroll:true});}
   function startTimer(){stopTimer();clockStart=performance.now();$('liveTimer').classList.remove('hidden');$('liveTimerValue').textContent='00:00.00';timer=setInterval(()=>$('liveTimerValue').textContent=human(performance.now()-clockStart),75)}
   function stopTimer(){if(timer){clearInterval(timer);timer=null}}
   // Browser-local identifier for unique-player best-score rankings.
@@ -224,7 +250,7 @@
       return inMemoryPlayerId;
     }
   }
-  async function start(){if(requestBusy)return;const nickname=$('nickname').value.trim();if((mode==='ranked10'||mode==='all')&&nickname.length>24){alert('ランキング名は24文字以内で入力してください');$('nickname').focus();return;}setBusy(true);$('startBtn').textContent='開始しています…';try{const useFilters=mode==='10'||mode==='20';const selectedEra=useFilters?$('era').value:'';const selectedCategory=useFilters?$('category').value:'';const resp=await api('start',{mode,era:selectedEra,category:selectedCategory,nickname,playerId:getPlayerId()});attemptScope={mode,era:selectedEra,category:selectedCategory};active=resp;personalChallengeStartedAt=performance.now();correctSoFar=0;paintQuestion(resp.question);$('liveTimer').classList.toggle('hidden',mode!=='ranked10');$('timedQuestionNote').classList.toggle('hidden',mode!=='ranked10');show('quiz');if(mode==='ranked10')startTimer();}catch(e){alert(errorMessage(e))}finally{$('startBtn').textContent='検定をスタート →';setBusy(false)}}
+  async function start(){if(requestBusy)return;const nickname=$('nickname').value.trim();if((mode==='ranked10'||mode==='all')&&nickname.length>24){alert('ランキング名は24文字以内で入力してください');$('nickname').focus();return;}setBusy(true);$('startBtn').textContent='開始しています…';try{const useFilters=mode==='10'||mode==='20';const selectedEra=useFilters?$('era').value:'';const selectedCategory=useFilters?$('category').value:'';const resp=await api('start',{mode,era:selectedEra,category:selectedCategory,nickname,playerId:getPlayerId()});attemptScope={mode,era:selectedEra,category:selectedCategory};active=resp;personalChallengeStartedAt=performance.now();questionMetaForPersonal=[];correctSoFar=0;paintQuestion(resp.question);$('liveTimer').classList.toggle('hidden',mode!=='ranked10');$('timedQuestionNote').classList.toggle('hidden',mode!=='ranked10');show('quiz');if(mode==='ranked10')startTimer();}catch(e){alert(errorMessage(e))}finally{$('startBtn').textContent='検定をスタート →';setBusy(false)}}
   async function answer(key){if(!active||!question||requestBusy||pending)return;setBusy(true);try{const resp=await api('answer',{sessionId:active.sessionId,token:active.token,choice:key});document.querySelectorAll('#choices button').forEach(b=>b.disabled=true);$('progressFill').style.width=(question.index/question.total*100)+'%';$('progressBar').setAttribute('aria-valuenow',String(Math.round(question.index/question.total*100)));if(resp.done){stopTimer();results(resp);return;}if(active.mode==='ranked10'){paintQuestion(resp.nextQuestion);return;}pending=resp.nextQuestion;const fb=resp.feedback;if(fb.correct)correctSoFar++;$('score').textContent=`正解 ${correctSoFar} 問`;$('feedbackTitle').textContent=fb.correct?'正解！':'残念！';$('feedbackTitle').className=fb.correct?'good':'bad';$('answerText').textContent='正解：'+fb.key; $('explanation').textContent=fb.explanation||'';const src=$('sources');src.replaceChildren();if(fb.source){const p=document.createElement('p');p.textContent='出典：'+fb.source;src.append(p)}if(fb.sourceUrl){try{const u=new URL(fb.sourceUrl);if(u.protocol==='https:'||u.protocol==='http:'){const a=document.createElement('a');a.href=u.href;a.textContent='出典ページを開く ↗';a.target='_blank';a.rel='noopener noreferrer';src.append(a)}}catch{}}document.querySelectorAll('#choices button').forEach(b=>b.classList.toggle('correct',b.dataset.key===fb.key));$('feedback').classList.remove('hidden');$('nextBtn').classList.remove('hidden');$('nextBtn').textContent='次の問題 →';$('feedback').scrollIntoView({block:'nearest',behavior:'smooth'});
     }catch(e){alert('回答を送信できませんでした。通信状態をご確認ください。\n'+errorMessage(e))}finally{setBusy(false);if(pending||!active||$('results').classList.contains('hidden')===false)document.querySelectorAll('#choices button').forEach(b=>b.disabled=true)}}
   function reviewList(items){const l=$('resultList');l.replaceChildren();items.forEach((r,i)=>{const li=document.createElement('li');const h=document.createElement('strong');h.textContent=`${i+1}問目：${r.question} — 正解 ${r.correct}（回答 ${r.choice}）`;const p=document.createElement('p');p.textContent=r.explanation||'';p.className='quiz-review';li.append(h,p);if(r.source){const cap=document.createElement('small');cap.textContent='出典：'+r.source;li.append(cap)}l.append(li)})}
@@ -274,6 +300,12 @@
       window.dispatchEvent(new CustomEvent('ca-quiz-finished',{detail:{
         mode:scope.mode,sessionId:active?.sessionId,correct,total,
         era:scope.era,category:scope.category,
+        details:(Array.isArray(r.reviews)?r.reviews:[]).map((rev,i)=>({
+          era:String(questionMetaForPersonal[i]?.era||scope.era||''),
+          categories:Array.isArray(questionMetaForPersonal[i]?.categories)&&questionMetaForPersonal[i].categories.length
+            ? questionMetaForPersonal[i].categories : (scope.category?[scope.category]:[]),
+          correct:rev.choice===rev.correct
+        })),
         elapsedMs:personalChallengeStartedAt?performance.now()-personalChallengeStartedAt:0
       }}));
     }
