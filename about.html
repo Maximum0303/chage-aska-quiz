@@ -37,7 +37,13 @@
     .footer-links{margin:15px 0;display:flex;align-items:center;justify-content:center;gap:18px}
     @media(max-width:520px){.wrap{width:min(100% - 22px,900px);padding-top:11px}.data th{width:33%} .data th,.data td{padding:10px 7px;font-size:12px}.toc{gap:7px}.toc a{font-size:12px;padding:6px 10px}}
     @media print{:root{color-scheme:light}body{background:white;color:#111}.wrap{width:100%}header,section{background:white;border:1px solid #ccc;box-shadow:none}h2,.eyebrow,.data th{color:#333}.lede,.muted{color:#555}a{color:#0645ad}.toc{display:none}}
-  </style>
+  
+/* Companion fan site links (2026) */
+.ca-related-sites{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 18px;margin:15px auto 2px;font:400 11px/1.8 ui-sans-serif,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;letter-spacing:.01em}
+.ca-related-sites a{color:#9baccc;text-decoration:none;transition:color .15s ease}
+.ca-related-sites a:hover{color:#e4c177;text-decoration:underline;text-underline-offset:3px}
+.ca-related-sites a:focus-visible{outline:2px solid #e4c177;outline-offset:3px;border-radius:2px}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -129,7 +135,13 @@
   <footer>
     <div class="footer-links"><a href="./index.html">検定トップに戻る</a><a href="#">ページ先頭へ</a></div>
     ファン個人が運営する非公式サイトです。
-  </footer>
+  
+  <nav class="ca-related-sites" aria-label="関連ファンサイト">
+    <a href="https://maximum0303.github.io/ca-song-map/" target="_blank" rel="noopener noreferrer">楽曲の地図 ↗</a>
+    <a href="https://maximum0303.github.io/ca-on-this-day/" target="_blank" rel="noopener noreferrer">C&Aの何の日？ ↗</a>
+    <a href="https://w.atwiki.jp/canda/" target="_blank" rel="noopener noreferrer">アーカイブWiki ↗</a>
+  </nav>
+</footer>
 </div>
 </body>
 </html>
